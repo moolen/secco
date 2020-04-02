@@ -3,13 +3,16 @@ package tracer
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/iovisor/gobpf/bcc"
 	"github.com/pkg/errors"
 	seccomp "github.com/seccomp/libseccomp-golang"
 	log "github.com/sirupsen/logrus"
+	"github.com/vishvananda/netns"
 )
 
 // event struct used to read data from the perf ring buffer
@@ -20,6 +23,23 @@ type event struct {
 	ID uint32
 	// NS id
 	NS uint32
+}
+
+// StartForDockerID starts a tracer for the specified docker container id
+func StartForDockerID(id string, stop <-chan struct{}) (map[string]int, error) {
+	ns, err := netns.GetFromDocker(id)
+	if err != nil {
+		return nil, fmt.Errorf("could not get docker id ns: %s", err)
+	}
+	var s syscall.Stat_t
+	err = syscall.Fstat(int(ns), &s)
+	if err != nil {
+
+		return nil, fmt.Errorf("could not fstat ns: %s", err)
+	}
+	netnsid := ns.UniqueId()
+	log.Infof("found netns: %s", netnsid)
+	return Start(s.Ino, stop)
 }
 
 // Start starts a trace for the provided netns id

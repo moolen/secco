@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"syscall"
 
 	"github.com/moolen/secco/pkg/tracer"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/vishvananda/netns"
 )
 
 var rootCmd = &cobra.Command{
@@ -29,18 +27,6 @@ var rootCmd = &cobra.Command{
 		if id == "" {
 			log.Fatalf("id can not be empty")
 		}
-		ns, err := netns.GetFromDocker(id)
-		if err != nil {
-			log.Fatal(err)
-		}
-		var s syscall.Stat_t
-		err = syscall.Fstat(int(ns), &s)
-		if err != nil {
-			log.Fatalf("could not fstat ns: %s", err)
-		}
-		netnsid := ns.UniqueId()
-		log.Infof("found netns: %s", netnsid)
-
 		stop := make(chan struct{})
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)
@@ -53,7 +39,7 @@ var rootCmd = &cobra.Command{
 			}
 		}()
 
-		calls, err := tracer.Start(s.Ino, stop)
+		calls, err := tracer.StartForDockerID(id, stop)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -65,12 +51,12 @@ func init() {
 	viper.AutomaticEnv()
 	flags := rootCmd.PersistentFlags()
 	// TODO: add k8s integration
-	//flags.String("kubeconfig", "", "kubeconfig to use")
+	flags.String("kubeconfig", "", "kubeconfig to use")
 	flags.String("loglevel", "debug", "set the loglevel")
 	flags.String("id", "", "specify the container id")
 	viper.BindPFlags(flags)
 	viper.BindEnv("loglevel", "LOGLEVEL")
-	//viper.BindEnv("kubeconfig", "KUBECONFIG")
+	viper.BindEnv("kubeconfig", "KUBECONFIG")
 }
 
 // Execute runs the root command
