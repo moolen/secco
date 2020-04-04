@@ -56,11 +56,19 @@ annotations:
 ```
 
 ## PoC Proposal
-DAEMONSET
-* create a minimum viable seccomp profile
-  * can we lock down read/wrote calls to specific directories?
-* sync seccomp profiles on nodes w/ daemonset
+Satellite DAEMONSET
+* runs a GRPC Service
+  * to start/stop a seccomp profiler (returns a json response)
+    * (?) can we lock down read/wrote calls to specific directories?
+  * to sync seccomp profiles on from core component
+  * for later: run "enforcer" for oci runtime to check what is actually running
 
-UI stuff
-* create profile from running pod
-* edit existing profile (+sync)
+core/ui component
+* UI: start/stop profiler to create seccomp profile from an existing/running pod
+* create a minimum viable BASE seccomp profile (general purpose)
+  * a user should be able to extend a certain base profile
+* migrate existing profiles
+* push profiles to satellites
+
+Webhook (optional)
+* mutate pods to add seccomp annotation based on label matching configured in UI
