@@ -6,8 +6,10 @@ service Agent {
     rpc RunTrace(RunTraceRequest) returns (stream RunTraceResponse) {}
 }
 
-message RunTraceRequest {}
+message RunTraceRequest {
+    string id = 1;
+}
 
 message RunTraceResponse {
-    map<string, int32> syscalls = 3;
+    map<string, int64> syscalls = 3;
 }
