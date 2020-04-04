@@ -1,6 +1,9 @@
 package agent
 
 import (
+	"context"
+	"time"
+
 	"github.com/moolen/secco/pkg/tracer"
 	pb "github.com/moolen/secco/proto"
 	log "github.com/sirupsen/logrus"
@@ -9,16 +12,15 @@ import (
 // RunTrace ..
 func (o *AgentServer) RunTrace(req *pb.RunTraceRequest, gfs pb.Agent_RunTraceServer) error {
 	reqID := req.GetId()
-	stop := make(chan struct{})
-	out := make(chan map[string]int64)
-	calls, err := tracer.StartForDockerID(reqID, stop, out)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
+	callChan, err := tracer.StartForDockerID(reqID, ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Infof("calls: %v", calls)
-
 	go func() {
-		for calls := range out {
+		log.Infof("reading callChan")
+		for calls := range callChan {
+			log.Infof("sending calls go server")
 			err := gfs.Send(&pb.RunTraceResponse{
 				Syscalls: calls,
 			})
@@ -26,12 +28,12 @@ func (o *AgentServer) RunTrace(req *pb.RunTraceRequest, gfs pb.Agent_RunTraceSer
 				log.Error(err)
 			}
 		}
+		log.Infof("call chan returned")
 	}()
-
 	for {
 		select {
 		case <-gfs.Context().Done():
-			stop <- struct{}{}
+			cancel()
 			return gfs.Context().Err()
 		default:
 		}
