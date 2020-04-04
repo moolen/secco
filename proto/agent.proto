@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package agent;
+
+service Agent {
+    rpc RunTrace(RunTraceRequest) returns (stream RunTraceResponse) {}
+}
+
+message RunTraceRequest {}
+
+message RunTraceResponse {
+    map<string, int32> syscalls = 3;
+}
