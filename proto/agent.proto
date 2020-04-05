@@ -3,13 +3,23 @@ syntax = "proto3";
 package agent;
 
 service Agent {
-    rpc RunTrace(RunTraceRequest) returns (stream RunTraceResponse) {}
+  rpc RunTrace(RunTraceRequest) returns (stream RunTraceResponse) {}
+  rpc SyncProfile(SyncProfileRequest) returns (SyncProfileResponse) {}
 }
 
-message RunTraceRequest {
-    string id = 1;
+message RunTraceRequest { string id = 1; }
+
+message RunTraceResponse { map<string, int64> syscalls = 3; }
+
+message SyncProfileRequest { repeated SeccompProfile profiles = 2; }
+
+message SeccompProfile {
+  string id = 1;
+  string name = 2;
+  bytes profile = 3;
 }
 
-message RunTraceResponse {
-    map<string, int64> syscalls = 3;
+message SyncProfileResponse {
+  bool success = 1;
+  string error = 2;
 }

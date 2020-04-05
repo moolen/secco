@@ -102,10 +102,154 @@ func (m *RunTraceResponse) GetSyscalls() map[string]int64 {
 	return nil
 }
 
+type SyncProfileRequest struct {
+	Profiles             []*SeccompProfile `protobuf:"bytes,2,rep,name=profiles,proto3" json:"profiles,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *SyncProfileRequest) Reset()         { *m = SyncProfileRequest{} }
+func (m *SyncProfileRequest) String() string { return proto.CompactTextString(m) }
+func (*SyncProfileRequest) ProtoMessage()    {}
+func (*SyncProfileRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_56ede974c0020f77, []int{2}
+}
+
+func (m *SyncProfileRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SyncProfileRequest.Unmarshal(m, b)
+}
+func (m *SyncProfileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SyncProfileRequest.Marshal(b, m, deterministic)
+}
+func (m *SyncProfileRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SyncProfileRequest.Merge(m, src)
+}
+func (m *SyncProfileRequest) XXX_Size() int {
+	return xxx_messageInfo_SyncProfileRequest.Size(m)
+}
+func (m *SyncProfileRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SyncProfileRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SyncProfileRequest proto.InternalMessageInfo
+
+func (m *SyncProfileRequest) GetProfiles() []*SeccompProfile {
+	if m != nil {
+		return m.Profiles
+	}
+	return nil
+}
+
+type SeccompProfile struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Profile              []byte   `protobuf:"bytes,3,opt,name=profile,proto3" json:"profile,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SeccompProfile) Reset()         { *m = SeccompProfile{} }
+func (m *SeccompProfile) String() string { return proto.CompactTextString(m) }
+func (*SeccompProfile) ProtoMessage()    {}
+func (*SeccompProfile) Descriptor() ([]byte, []int) {
+	return fileDescriptor_56ede974c0020f77, []int{3}
+}
+
+func (m *SeccompProfile) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SeccompProfile.Unmarshal(m, b)
+}
+func (m *SeccompProfile) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SeccompProfile.Marshal(b, m, deterministic)
+}
+func (m *SeccompProfile) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SeccompProfile.Merge(m, src)
+}
+func (m *SeccompProfile) XXX_Size() int {
+	return xxx_messageInfo_SeccompProfile.Size(m)
+}
+func (m *SeccompProfile) XXX_DiscardUnknown() {
+	xxx_messageInfo_SeccompProfile.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SeccompProfile proto.InternalMessageInfo
+
+func (m *SeccompProfile) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *SeccompProfile) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *SeccompProfile) GetProfile() []byte {
+	if m != nil {
+		return m.Profile
+	}
+	return nil
+}
+
+type SyncProfileResponse struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Error                string   `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SyncProfileResponse) Reset()         { *m = SyncProfileResponse{} }
+func (m *SyncProfileResponse) String() string { return proto.CompactTextString(m) }
+func (*SyncProfileResponse) ProtoMessage()    {}
+func (*SyncProfileResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_56ede974c0020f77, []int{4}
+}
+
+func (m *SyncProfileResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SyncProfileResponse.Unmarshal(m, b)
+}
+func (m *SyncProfileResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SyncProfileResponse.Marshal(b, m, deterministic)
+}
+func (m *SyncProfileResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SyncProfileResponse.Merge(m, src)
+}
+func (m *SyncProfileResponse) XXX_Size() int {
+	return xxx_messageInfo_SyncProfileResponse.Size(m)
+}
+func (m *SyncProfileResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_SyncProfileResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SyncProfileResponse proto.InternalMessageInfo
+
+func (m *SyncProfileResponse) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+func (m *SyncProfileResponse) GetError() string {
+	if m != nil {
+		return m.Error
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*RunTraceRequest)(nil), "agent.RunTraceRequest")
 	proto.RegisterType((*RunTraceResponse)(nil), "agent.RunTraceResponse")
 	proto.RegisterMapType((map[string]int64)(nil), "agent.RunTraceResponse.SyscallsEntry")
+	proto.RegisterType((*SyncProfileRequest)(nil), "agent.SyncProfileRequest")
+	proto.RegisterType((*SeccompProfile)(nil), "agent.SeccompProfile")
+	proto.RegisterType((*SyncProfileResponse)(nil), "agent.SyncProfileResponse")
 }
 
 func init() {
@@ -113,20 +257,28 @@ func init() {
 }
 
 var fileDescriptor_56ede974c0020f77 = []byte{
-	// 199 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4e, 0x4c, 0x4f, 0xcd,
-	0x2b, 0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0x73, 0x94, 0x14, 0xb9, 0xf8, 0x83,
-	0x4a, 0xf3, 0x42, 0x8a, 0x12, 0x93, 0x53, 0x83, 0x52, 0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0x84, 0xf8,
-	0xb8, 0x98, 0x32, 0x53, 0x24, 0x18, 0x15, 0x18, 0x35, 0x38, 0x83, 0x98, 0x32, 0x53, 0x94, 0x26,
-	0x31, 0x72, 0x09, 0x20, 0xd4, 0x14, 0x17, 0xe4, 0xe7, 0x15, 0xa7, 0x0a, 0x39, 0x72, 0x71, 0x14,
-	0x57, 0x16, 0x27, 0x27, 0xe6, 0xe4, 0x14, 0x4b, 0x30, 0x2b, 0x30, 0x6b, 0x70, 0x1b, 0xa9, 0xea,
-	0x41, 0x8c, 0x47, 0x57, 0xaa, 0x17, 0x0c, 0x55, 0xe7, 0x9a, 0x57, 0x52, 0x54, 0x19, 0x04, 0xd7,
-	0x26, 0x65, 0xcd, 0xc5, 0x8b, 0x22, 0x25, 0x24, 0xc0, 0xc5, 0x9c, 0x9d, 0x5a, 0x09, 0xb5, 0x19,
-	0xc4, 0x14, 0x12, 0xe1, 0x62, 0x2d, 0x4b, 0xcc, 0x29, 0x4d, 0x95, 0x60, 0x52, 0x60, 0xd4, 0x60,
-	0x0e, 0x82, 0x70, 0xac, 0x98, 0x2c, 0x18, 0x8d, 0x3c, 0xb8, 0x58, 0x1d, 0x41, 0xd6, 0x09, 0xd9,
-	0x73, 0x71, 0xc0, 0x6c, 0x14, 0x12, 0xc3, 0x70, 0x02, 0xd8, 0x47, 0x52, 0xe2, 0x38, 0x9c, 0xa6,
-	0xc4, 0x60, 0xc0, 0x98, 0xc4, 0x06, 0x0e, 0x0f, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0x08,
-	0x8b, 0x79, 0xca, 0x1e, 0x01, 0x00, 0x00,
+	// 321 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x92, 0xcf, 0x4e, 0xf3, 0x30,
+	0x10, 0xc4, 0x3f, 0x27, 0x5f, 0x69, 0xba, 0x85, 0x52, 0x2d, 0xff, 0x4c, 0x4e, 0x21, 0x12, 0x52,
+	0x4e, 0x15, 0x94, 0x0b, 0x82, 0x03, 0xea, 0xa1, 0x70, 0x43, 0xc8, 0xe5, 0x05, 0x82, 0x6b, 0x50,
+	0x45, 0x1a, 0x07, 0x3b, 0x41, 0xca, 0x5b, 0x20, 0x9e, 0x18, 0xd5, 0xb1, 0x0b, 0x6d, 0xe1, 0xb6,
+	0x93, 0x9d, 0x4c, 0x7e, 0x3b, 0x0a, 0x74, 0xd3, 0x17, 0x91, 0x97, 0x83, 0x42, 0xc9, 0x52, 0x62,
+	0xcb, 0x88, 0xf8, 0x04, 0x76, 0x59, 0x95, 0x3f, 0xaa, 0x94, 0x0b, 0x26, 0xde, 0x2a, 0xa1, 0x4b,
+	0xec, 0x81, 0x37, 0x9b, 0x52, 0x12, 0x91, 0xa4, 0xc3, 0xbc, 0xd9, 0x34, 0xfe, 0x24, 0xd0, 0xff,
+	0xf6, 0xe8, 0x42, 0xe6, 0x5a, 0xe0, 0x08, 0x02, 0x5d, 0x6b, 0x9e, 0x66, 0x99, 0xa6, 0x7e, 0xe4,
+	0x27, 0xdd, 0xe1, 0xe9, 0xa0, 0x89, 0x5f, 0xb7, 0x0e, 0x26, 0xd6, 0x37, 0xce, 0x4b, 0x55, 0xb3,
+	0xe5, 0x6b, 0xe1, 0x35, 0xec, 0xac, 0xac, 0xb0, 0x0f, 0xfe, 0xab, 0xa8, 0xed, 0x97, 0x17, 0x23,
+	0xee, 0x43, 0xeb, 0x3d, 0xcd, 0x2a, 0x41, 0xbd, 0x88, 0x24, 0x3e, 0x6b, 0xc4, 0x95, 0x77, 0x49,
+	0xe2, 0x3b, 0xc0, 0x49, 0x9d, 0xf3, 0x07, 0x25, 0x9f, 0x67, 0xd9, 0x12, 0xfd, 0x1c, 0x82, 0xa2,
+	0x79, 0xa2, 0xa9, 0x67, 0xa8, 0x0e, 0x2c, 0xd5, 0x44, 0x70, 0x2e, 0xe7, 0x85, 0xf3, 0x2f, 0x6d,
+	0xf1, 0x3d, 0xf4, 0x56, 0x77, 0xeb, 0xf7, 0x23, 0xc2, 0xff, 0x3c, 0x9d, 0x37, 0x0c, 0x1d, 0x66,
+	0x66, 0xa4, 0xd0, 0xb6, 0x09, 0xd4, 0x8f, 0x48, 0xb2, 0xcd, 0x9c, 0x8c, 0xc7, 0xb0, 0xb7, 0x02,
+	0x66, 0xfb, 0xa2, 0xd0, 0xd6, 0x15, 0xe7, 0x42, 0x6b, 0x93, 0x1c, 0x30, 0x27, 0x17, 0x37, 0x0a,
+	0xa5, 0xa4, 0xb2, 0xf9, 0x8d, 0x18, 0x7e, 0x10, 0x68, 0x8d, 0x16, 0xe4, 0x78, 0x03, 0x81, 0xab,
+	0x14, 0x0f, 0x37, 0x3a, 0x36, 0x77, 0x87, 0x47, 0x7f, 0x74, 0x1f, 0xff, 0x3b, 0x23, 0x78, 0x0b,
+	0xdd, 0x1f, 0x44, 0x78, 0xec, 0x1a, 0xd9, 0xa8, 0x2f, 0x0c, 0x7f, 0x5b, 0xb9, 0xa4, 0xa7, 0x2d,
+	0xf3, 0xe3, 0x5c, 0x7c, 0x05, 0x00, 0x00, 0xff, 0xff, 0xee, 0xde, 0xcc, 0x47, 0x47, 0x02, 0x00,
+	0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -142,6 +294,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AgentClient interface {
 	RunTrace(ctx context.Context, in *RunTraceRequest, opts ...grpc.CallOption) (Agent_RunTraceClient, error)
+	SyncProfile(ctx context.Context, in *SyncProfileRequest, opts ...grpc.CallOption) (*SyncProfileResponse, error)
 }
 
 type agentClient struct {
@@ -184,9 +337,19 @@ func (x *agentRunTraceClient) Recv() (*RunTraceResponse, error) {
 	return m, nil
 }
 
+func (c *agentClient) SyncProfile(ctx context.Context, in *SyncProfileRequest, opts ...grpc.CallOption) (*SyncProfileResponse, error) {
+	out := new(SyncProfileResponse)
+	err := c.cc.Invoke(ctx, "/agent.Agent/SyncProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServer is the server API for Agent service.
 type AgentServer interface {
 	RunTrace(*RunTraceRequest, Agent_RunTraceServer) error
+	SyncProfile(context.Context, *SyncProfileRequest) (*SyncProfileResponse, error)
 }
 
 // UnimplementedAgentServer can be embedded to have forward compatible implementations.
@@ -195,6 +358,9 @@ type UnimplementedAgentServer struct {
 
 func (*UnimplementedAgentServer) RunTrace(req *RunTraceRequest, srv Agent_RunTraceServer) error {
 	return status.Errorf(codes.Unimplemented, "method RunTrace not implemented")
+}
+func (*UnimplementedAgentServer) SyncProfile(ctx context.Context, req *SyncProfileRequest) (*SyncProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncProfile not implemented")
 }
 
 func RegisterAgentServer(s *grpc.Server, srv AgentServer) {
@@ -222,10 +388,33 @@ func (x *agentRunTraceServer) Send(m *RunTraceResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Agent_SyncProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).SyncProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/agent.Agent/SyncProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).SyncProfile(ctx, req.(*SyncProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Agent_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "agent.Agent",
 	HandlerType: (*AgentServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SyncProfile",
+			Handler:    _Agent_SyncProfile_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "RunTrace",

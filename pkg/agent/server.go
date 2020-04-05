@@ -13,14 +13,16 @@ import (
 
 // AgentServer ..
 type AgentServer struct {
-	listener net.Listener
-	server   *grpc.Server
+	profileBasePath string
+	listener        net.Listener
+	server          *grpc.Server
 }
 
 // NewAgentServer ..
-func NewAgentServer() (*AgentServer, error) {
+func NewAgentServer(profileBasePath string) (*AgentServer, error) {
 
 	as := &AgentServer{
+		profileBasePath: profileBasePath,
 		server: grpc.NewServer(
 			grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 			grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),

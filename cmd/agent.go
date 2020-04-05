@@ -16,8 +16,10 @@ import (
 
 func init() {
 	flags := agentCmd.PersistentFlags()
+	flags.String("profile-base-path", "./profiles", "base path for the seccomp profiles")
 	//	flags.String("k8s-node", "", "kubernetes node name")
 	viper.BindPFlags(flags)
+	viper.BindEnv("profile-base-path", "PROFILE_BASE_PATH")
 	//	viper.BindEnv("k8s-node", "KUBERNETES_NODE")
 	rootCmd.AddCommand(agentCmd)
 }
@@ -28,7 +30,7 @@ var agentCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Infof("starting agent")
 
-		srv, err := agent.NewAgentServer()
+		srv, err := agent.NewAgentServer(viper.GetString("profile-base-path"))
 		if err != nil {
 			log.Fatal(err)
 		}
