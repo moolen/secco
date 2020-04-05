@@ -8,6 +8,7 @@ import (
 	"time"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	client "github.com/moolen/secco/pkg/client"
 	pb "github.com/moolen/secco/proto"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -16,11 +17,11 @@ import (
 type Server struct {
 	listener net.Listener
 	server   *grpc.Server
-	agent    *AgentClient
+	agent    *client.AgentClient
 }
 
 func New(target string, port int, syncInterval time.Duration, bufferSize int) (*Server, error) {
-	agent, err := NewAgentClient(target)
+	agent, err := client.New(target)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func (srv *Server) Serve(ctx context.Context) {
 	go func() {
 		// testing
 		c, _ := context.WithDeadline(context.Background(), time.Now().Add(time.Second*30))
-		rc, err := srv.agent.client.RunTrace(c, &pb.RunTraceRequest{
+		rc, err := srv.agent.RunTrace(c, &pb.RunTraceRequest{
 			Id: os.Getenv("DID"),
 		})
 		if err != nil {

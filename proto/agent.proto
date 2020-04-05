@@ -7,7 +7,10 @@ service Agent {
   rpc SyncProfile(SyncProfileRequest) returns (SyncProfileResponse) {}
 }
 
-message RunTraceRequest { string id = 1; }
+message RunTraceRequest {
+  string id = 1;
+  int64 duration = 2; // microseconds
+ }
 
 message RunTraceResponse { map<string, int64> syscalls = 3; }
 

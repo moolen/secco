@@ -17,7 +17,8 @@ import (
 // RunTrace starts a trace for the provided docker container id
 func (o *AgentServer) RunTrace(req *pb.RunTraceRequest, gfs pb.Agent_RunTraceServer) error {
 	reqID := req.GetId()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
+	log.Infof("req: %v", time.Duration(req.Duration))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(req.Duration))
 	callChan, err := tracer.StartForDockerID(reqID, ctx)
 	if err != nil {
 		log.Fatal(err)
@@ -38,6 +39,8 @@ func (o *AgentServer) RunTrace(req *pb.RunTraceRequest, gfs pb.Agent_RunTraceSer
 					log.Error(err)
 				}
 				mu.RUnlock()
+			case <-ctx.Done():
+				return
 			case <-gfs.Context().Done():
 				log.Infof("stopping push timer")
 				return
@@ -56,6 +59,9 @@ func (o *AgentServer) RunTrace(req *pb.RunTraceRequest, gfs pb.Agent_RunTraceSer
 
 	for {
 		select {
+		case <-ctx.Done():
+			cancel()
+			return nil
 		case <-gfs.Context().Done():
 			cancel()
 			return gfs.Context().Err()

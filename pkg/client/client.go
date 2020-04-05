@@ -1,4 +1,4 @@
-package server
+package client
 
 import (
 	"context"
@@ -16,8 +16,8 @@ import (
 
 // AgentClient ..
 type AgentClient struct {
-	conn   *grpc.ClientConn
-	client pb.AgentClient
+	conn *grpc.ClientConn
+	pb.AgentClient
 }
 
 const (
@@ -26,7 +26,7 @@ const (
 )
 
 // NewGateway ..
-func NewAgentClient(address string) (*AgentClient, error) {
+func New(address string) (*AgentClient, error) {
 	log.Infof("creating grpc gateway: %s", address)
 	callOpts := []retry.CallOption{
 		retry.WithBackoff(retry.BackoffLinear(RetryInterval)),
