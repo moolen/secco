@@ -27,7 +27,7 @@ type event struct {
 }
 
 // StartForDockerID starts a tracer for the specified docker container id
-func StartForDockerID(id string, ctx context.Context) (chan map[string]int64, error) {
+func StartForDockerID(id string, ctx context.Context) (chan string, error) {
 	ns, err := netns.GetFromDocker(id)
 	if err != nil {
 		return nil, fmt.Errorf("could not get docker id ns: %s", err)
@@ -39,20 +39,19 @@ func StartForDockerID(id string, ctx context.Context) (chan map[string]int64, er
 		return nil, fmt.Errorf("could not fstat ns: %s", err)
 	}
 	netnsid := ns.UniqueId()
-	log.Infof("found netns: %s for %s", netnsid, id)
+	log.Debugf("found netns: %s for %s", netnsid, id)
 	return Start(s.Ino, ctx)
 }
 
 // Start starts a trace for the provided netns id
 // get nets from `sudo lsns -t net` or using vishvananda/netns
 // see nsproxy.h, net_namespace.h and ns_common.h in kernel headers
-func Start(nsid uint64, ctx context.Context) (chan map[string]int64, error) {
+func Start(nsid uint64, ctx context.Context) (chan string, error) {
 	log.Infof("starting tracer for %d", nsid)
-	out := make(chan map[string]int64)
+	out := make(chan string)
 	syscalls := make(map[string]int64, 303)
 	src := strings.Replace(source, "$TRACE_NS", strconv.FormatUint(nsid, 10), -1)
 	m := bcc.NewModule(src, []string{})
-	defer m.Close()
 	enterTrace, err := m.LoadTracepoint("enter_trace")
 	if err != nil {
 		return out, errors.Wrap(err, "error loading tracepoint")
@@ -66,7 +65,7 @@ func Start(nsid uint64, ctx context.Context) (chan map[string]int64, error) {
 	if err != nil {
 		return out, errors.Wrap(err, "error initializing perf map")
 	}
-	go perfMap.Start()
+	perfMap.Start()
 
 	go func() {
 		var e event
@@ -74,7 +73,9 @@ func Start(nsid uint64, ctx context.Context) (chan map[string]int64, error) {
 		for {
 			select {
 			case <-ctx.Done():
-				log.Infof("got stop signal, returning from trace")
+				log.Debugf("got stop signal, returning from trace")
+				close(out)
+				m.Close()
 				break readLoop
 			case data := <-channel:
 				err := binary.Read(bytes.NewBuffer(data), binary.LittleEndian, &e)
@@ -88,12 +89,12 @@ func Start(nsid uint64, ctx context.Context) (chan map[string]int64, error) {
 					continue
 				}
 				syscalls[name]++
-				log.Infof("recorded evt %v", e)
-				out <- syscalls
-				log.Infof("wrote evt %v", e)
+				out <- name
+				log.Debugf("wrote evt %v", e)
 			}
 		}
 		perfMap.Stop()
+		log.Debugf("stopped perf map")
 	}()
 
 	return out, nil
