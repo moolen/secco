@@ -2,10 +2,6 @@ package agent
 
 import (
 	"context"
-	"io/ioutil"
-	"os"
-	"path"
-	"strings"
 	"sync"
 	"time"
 
@@ -67,37 +63,4 @@ func (o *AgentServer) RunTrace(req *pb.RunTraceRequest, gfs pb.Agent_RunTraceSer
 			return gfs.Context().Err()
 		}
 	}
-}
-
-func (o *AgentServer) SyncProfile(ctx context.Context, req *pb.SyncProfileRequest) (*pb.SyncProfileResponse, error) {
-	var errors []string
-	for _, profile := range req.Profiles {
-		dPath := path.Join(o.profileBasePath, profile.GetName())
-		dDir := path.Dir(dPath)
-		// check directory traversal attempt
-		if !strings.HasPrefix(o.profileBasePath, dDir) {
-			errors = append(errors, "dest dir not in base path")
-			continue
-		}
-		err := os.MkdirAll(dDir, os.ModeDir)
-		if err != nil {
-			errors = append(errors, "failed to mkdir")
-			continue
-		}
-		err = ioutil.WriteFile(dPath, profile.Profile, os.ModePerm)
-		if err != nil {
-			errors = append(errors, "failed to write file")
-		}
-	}
-
-	if len(errors) > 0 {
-		return &pb.SyncProfileResponse{
-			Success: false,
-			Error:   strings.Join(errors, ", "),
-		}, nil
-	}
-
-	return &pb.SyncProfileResponse{
-		Success: true,
-	}, nil
 }
