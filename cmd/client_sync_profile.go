@@ -2,11 +2,14 @@ package cmd
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
 	"os/signal"
+	"path"
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/moolen/secco/pkg/client"
 	pb "github.com/moolen/secco/proto"
 	log "github.com/sirupsen/logrus"
@@ -16,11 +19,11 @@ import (
 
 func init() {
 	flags := syncProfileCmd.PersistentFlags()
-	flags.Duration("duration", time.Second*10, "specify the trace duration")
-	flags.String("id", "", "specify container to trace")
+	flags.String("profile", "", "path to the profile")
+	flags.Duration("timeout", time.Second*10, "sync timeout")
 	viper.BindPFlags(flags)
-	viper.BindEnv("duration", "TRACE_DURATION")
-	viper.BindEnv("id", "CONTAINER_ID")
+	viper.BindEnv("profile", "PROFILE_PATH")
+	viper.BindEnv("timeout", "TIMEOUT")
 	clientCmd.AddCommand(syncProfileCmd)
 }
 
@@ -34,7 +37,7 @@ var syncProfileCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("duration"))
+		ctx, cancel := context.WithTimeout(context.Background(), viper.GetDuration("timeout"))
 		stopChan := make(chan os.Signal)
 		signal.Notify(stopChan, os.Interrupt)
 		signal.Notify(stopChan, syscall.SIGTERM)
@@ -43,8 +46,19 @@ var syncProfileCmd = &cobra.Command{
 			<-stopChan
 			cancel()
 		}()
-		// TODO: parse profile
-		res, err := client.SyncProfile(ctx, &pb.SyncProfileRequest{})
+		profile, err := ioutil.ReadFile(viper.GetString("profile"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		res, err := client.SyncProfile(ctx, &pb.SyncProfileRequest{
+			Profiles: []*pb.SeccompProfile{
+				{
+					Id:      uuid.New().String(),
+					Name:    path.Base(viper.GetString("profile")),
+					Profile: profile,
+				},
+			},
+		})
 		if err != nil {
 			log.Fatal(err)
 		}
